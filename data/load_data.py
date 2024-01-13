@@ -8,10 +8,11 @@ from torchvision.transforms import ToTensor
 
 # from modelconfig import config as mcfg
 
+
 def load():
-#对图像做变换
+    # 对图像做变换
     # data_transform = transforms.Compose(
-    #     [  
+    #     [
     #         transforms.Resize(1200),
     #         transforms.RandomCrop((800,800)),
     #         transforms.ToTensor(),
@@ -25,7 +26,7 @@ def load():
     # #85%的图片是训练集
     # train_size = int(0.85 * len(full_dataset))
     # test_size = len(full_dataset) - train_size
-    
+
     # train_dataset, test_dataset = torch.utils.data.random_split(full_dataset, [train_size, test_size])
     # print(len(train_dataset),len(test_dataset))
 
@@ -35,17 +36,11 @@ def load():
     # return (train_loader, test_loader)
 
     training_data = datasets.CIFAR10(
-        root="data",
-        train=True,
-        download=True,
-        transform=ToTensor()
+        root="data", train=True, download=True, transform=ToTensor()
     )
 
     test_data = datasets.CIFAR10(
-        root="data",
-        train=False,
-        download=True,
-        transform=ToTensor()
+        root="data", train=False, download=True, transform=ToTensor()
     )
     train_loader = DataLoader(training_data, batch_size=8, shuffle=True, num_workers=2)
     test_loader = DataLoader(test_data, batch_size=8, shuffle=True, num_workers=2)
@@ -54,7 +49,7 @@ def load():
 
 
 if __name__ == "__main__":
-    train_loader, test_loader=load()
+    train_loader, test_loader = load()
     train_features, train_labels = next(iter(train_loader))
     label = train_labels[0]
     # classes=("plane","car","bird","cat","deer","dog","frog","horse","ship","truck")
@@ -62,5 +57,3 @@ if __name__ == "__main__":
     print(f"Labels batch shape: {train_labels.size()}")
     print(f"Label: {label}")
     print(label)
-
-

@@ -18,8 +18,8 @@ def train(
     config: Dict,
     train_loader: DataLoader,
     val_loader: DataLoader,
-    optimizer:torch.optim,
-    criterion:nn.modules.loss,
+    optimizer: torch.optim,
+    criterion: nn.modules.loss,
     model: nn.Module,
 ):
     model.to(device)
@@ -43,8 +43,9 @@ def train(
             running_loss += loss
             if i % 1000 == 999:
                 wandb.log({"loss": running_loss / 2000})
+                running_loss = 0.0
 
-        val_acc=val(model, val_loader)
+        val_acc = val(model, val_loader)
         wandb.log({"Accuracy": val_acc})
 
 
@@ -67,6 +68,7 @@ def val(model: nn.Module, val_loader: DataLoader):
 
     return acc
 
+
 if __name__ == "__main__":
     # start a new wandb run to track this script
     wandb.init(
@@ -75,8 +77,8 @@ if __name__ == "__main__":
         # track hyperparameters and run metadata
         config={
             "learning_rate": 0.001,
-            "architecture": "mlp",
-            "dataset": "mnist",
+            "architecture": "resnet18 with pretrained weights",
+            "dataset": "cifar10",
             "epochs": 15,
             "device": device,
         },
@@ -90,6 +92,13 @@ if __name__ == "__main__":
     wandb.watch(model)
 
     # Train the model
-    train(wandb.config,train_loader=train_loader,val_loader=val_loader,optimizer=optimizer,criterion=criterion,model=model)
+    train(
+        wandb.config,
+        train_loader=train_loader,
+        val_loader=val_loader,
+        optimizer=optimizer,
+        criterion=criterion,
+        model=model,
+    )
 
     wandb.finish()
