@@ -22,6 +22,7 @@ def train(
     criterion:nn.modules.loss,
     model: nn.Module,
 ):
+    model.to(device)
     for epoch in range(config.get("epochs")):
         running_loss = 0.0
         model.train()
@@ -76,7 +77,7 @@ if __name__ == "__main__":
             "learning_rate": 0.001,
             "architecture": "mlp",
             "dataset": "mnist",
-            "epochs": 2,
+            "epochs": 15,
             "device": device,
         },
     )

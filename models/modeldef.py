@@ -1,7 +1,10 @@
+from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from torchvision import models
+from torchvision.models import ResNet18_Weights
 
 
 class Model(nn.Module):
@@ -31,7 +34,20 @@ class Model(nn.Module):
 
 
 # Define model, loss function, and optimizer
-realmodel = Model()
+
+# model defined above
+# realmodel = Model()
+
+#resnet18 with pretrained weights
+realmodel=models.resnet18(weights=ResNet18_Weights.DEFAULT)
+classifier = nn.Sequential(OrderedDict([
+                            ('fc1', nn.Linear(10752, 1792)),
+                            ('relu', nn.ReLU()),
+                            ('fc2', nn.Linear(1792, 10)),
+                            ('output', nn.LogSoftmax(dim=1))
+                            ]))
+
+realmodel.fc = classifier
 loss_fn = nn.CrossEntropyLoss()
 optimizer = optim.SGD(realmodel.parameters(), lr=0.001, momentum=0.9)
 
