@@ -1,5 +1,5 @@
-data/**
 wandb/**
 checkpoints/**
 
 **.pyc
+data/cifar-10-batches-py/**
