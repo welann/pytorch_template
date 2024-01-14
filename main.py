@@ -41,6 +41,9 @@ def train(
     model: nn.Module,
 ):
     model.to(device)
+  
+    wandb.watch(model,criterion,log="all", log_freq=10)
+
     for epoch in range(config.get("epochs")):
         running_loss = 0.0
         model.train()
@@ -71,9 +74,7 @@ def train(
         val_acc = val(model, val_loader)
         wandb.log({"Accuracy": val_acc})
 
-    torch.save(
-        model,
-    )
+    save_checkpoint(model=model, optimizer=optimizer, path="checkpoints",epoch=0)
 
 
 def val(model: nn.Module, val_loader: DataLoader):
@@ -106,7 +107,7 @@ if __name__ == "__main__":
             "learning_rate": 0.001,
             "architecture": "resnet18 with pretrained weights",
             "dataset": "cifar10",
-            "epochs": 2,
+            "epochs": 1,
             "checkpoint_interval": 10,
             "device": device,
         },
@@ -117,7 +118,6 @@ if __name__ == "__main__":
     criterion = modeldef.loss_fn
     model = modeldef.realmodel
 
-    wandb.watch(model)
 
     # Train the model
     train(
