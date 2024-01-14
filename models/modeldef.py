@@ -42,9 +42,9 @@ realmodel = models.resnet18(weights=ResNet18_Weights.DEFAULT)
 classifier = nn.Sequential(
     OrderedDict(
         [
-            ("fc1", nn.Linear(10752, 1792)),
+            ("fc1", nn.Linear(512, 256)),
             ("relu", nn.ReLU()),
-            ("fc2", nn.Linear(1792, 10)),
+            ("fc2", nn.Linear(256, 10)),
             ("output", nn.LogSoftmax(dim=1)),
         ]
     )

@@ -1,6 +1,7 @@
 import wandb
-import random
 import torch
+from pathlib import Path
+
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
@@ -12,6 +13,23 @@ from data import load_data
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
+def save_checkpoint(model: nn.Module, optimizer: torch.optim, path: str, epoch: int):
+    p = Path(path)
+
+    if not p.exists():
+        p.mkdir()
+
+    checkpoint = {
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict(),
+        "epoch": epoch,
+    }
+
+    checkpoint_name = "checkpoint_{}_epoch.pkl".format(epoch)
+    checkpoint_path = p / checkpoint_name
+    torch.save(checkpoint, checkpoint_path)
 
 
 def train(
@@ -45,8 +63,17 @@ def train(
                 wandb.log({"loss": running_loss / 2000})
                 running_loss = 0.0
 
+        if epoch % config.get("checkpoint_interval") == 0:
+            save_checkpoint(
+                model=model, optimizer=optimizer, path="checkpoints", epoch=epoch
+            )
+
         val_acc = val(model, val_loader)
         wandb.log({"Accuracy": val_acc})
+
+    torch.save(
+        model,
+    )
 
 
 def val(model: nn.Module, val_loader: DataLoader):
@@ -79,7 +106,8 @@ if __name__ == "__main__":
             "learning_rate": 0.001,
             "architecture": "resnet18 with pretrained weights",
             "dataset": "cifar10",
-            "epochs": 15,
+            "epochs": 2,
+            "checkpoint_interval": 10,
             "device": device,
         },
     )
