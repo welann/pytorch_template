@@ -10,7 +10,9 @@ from typing import Dict
 # import modelconfig.config as mcfg
 import models.modeldef as modeldef
 from data import load_data
+import logging
 
+logging.basicConfig(level=logging.INFO, filename='logs/test.log', filemode='w')
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -27,7 +29,7 @@ def save_checkpoint(model: nn.Module, optimizer: torch.optim, path: str, epoch: 
         "epoch": epoch,
     }
 
-    checkpoint_name = "checkpoint_{}_epoch.pkl".format(epoch)
+    checkpoint_name = "checkpoint_{}_epoch.pt".format(epoch)
     checkpoint_path = p / checkpoint_name
     torch.save(checkpoint, checkpoint_path)
 
@@ -64,6 +66,7 @@ def train(
             running_loss += loss
             if i % 1000 == 999:
                 wandb.log({"loss": running_loss / 2000})
+                logging.info(f"loss: {loss}")
                 running_loss = 0.0
 
         if epoch % config.get("checkpoint_interval") == 0:
@@ -73,7 +76,7 @@ def train(
 
         val_acc = val(model, val_loader)
         wandb.log({"Accuracy": val_acc})
-
+        logging.info(f"acc: {val_acc}")
     save_checkpoint(model=model, optimizer=optimizer, path="checkpoints",epoch=0)
 
 
@@ -102,6 +105,11 @@ if __name__ == "__main__":
     wandb.init(
         # set the wandb project where this run will be logged
         project="pytorch template",
+        
+        job_type="train",
+        name="Resnet18",
+        notes="使用预训练好的resnet18进行cifar10的分类任务",
+        tags=["resnet","cifar10"],
         # track hyperparameters and run metadata
         config={
             "learning_rate": 0.001,
